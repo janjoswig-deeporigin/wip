@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 
 import numpy as np
 import parmed
@@ -67,7 +68,8 @@ def copy_residue_names_from_prmtop_to_pdb(
         if len(reference_residue_names) != len(target_residue_names):
             raise ValueError("Reference and target structures have different number of residues")
 
-    with open(target_pdb) as fp, open(output_pdb, "w") as out_fp:
+    tmp_output_pdb = output_pdb.with_suffix(".tmp.pdb")
+    with open(target_pdb) as fp, open(tmp_output_pdb, "w") as out_fp:
         last_chainid = None
         last_resid = None
         reference_index = -1
@@ -102,13 +104,24 @@ def copy_residue_names_from_prmtop_to_pdb(
 
             out_fp.write(line[:17] + f"{new_resname:>3}" + line[20:])
 
+    shutil.move(tmp_output_pdb, output_pdb)
+
 
 def reprotonate_pdb_with_reference(
     reference_prmtop: str | pathlib.Path,
     target_pdb: str | pathlib.Path,
     output_pdb: str | pathlib.Path,
     working_directory: str | pathlib.Path | None = None,
-):
+) -> None:
+    """Protonate a PDB file using a reference prmtop file
+
+    Args:
+        reference_prmtop: Path to the reference prmtop file
+        target_pdb: Path to the target PDB file
+        output_pdb: Path to the output PDB file
+        working_directory: Path to a working directory (will be passed down to
+            tleap execution).
+    """
 
     copy_residue_names_from_prmtop_to_pdb(
         reference_prmtop=reference_prmtop,
