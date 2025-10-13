@@ -11,27 +11,6 @@ from loguru import logger
 from wip.setup import tleap
 
 
-def total_charge(mol, backend="rdkit"):
-    """Calculate total charge of a molecule using the specified backend"""
-    if backend == "rdkit":
-        return total_charge_rdkit(mol)
-    elif backend == "openbabel":
-        return total_charge_openbabel(mol)
-    else:
-        raise ValueError(f"Unknown backend: {backend}")
-
-
-def total_charge_openbabel(mol):
-    """Calculate total charge of a molecule using Open Babel."""
-
-    obmol = next(pybel.readfile("mol2", mol))
-    return obmol.charge
-
-
-def total_charge_rdkit(mol):
-    raise NotImplementedError("RDKit backend for total_charge is not implemented yet.")
-
-
 def copy_residue_names_from_prmtop_to_pdb(
     reference_prmtop: str | pathlib.Path,
     target_pdb: str | pathlib.Path,
